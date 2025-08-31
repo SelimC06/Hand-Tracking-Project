@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 import pickle
 import numpy as np
+import webbrowser
 
 model_d = pickle.load(open('./model.p', 'rb'))
 model = model_d['model']
@@ -16,7 +17,11 @@ mpDrawStyles = mp.solutions.drawing_styles
 hands = mp_hands.Hands(static_image_mode = True, min_detection_confidence = 0.3)
 
 labels = {0: 'Close', 1: 'Open'}
+test = ["Close", "Open"]
+curr = []
 while True:
+    if len(curr) == 2:
+        curr = []
     ret, image = cap.read()
     data_setup = []
     x_ = []
@@ -58,9 +63,12 @@ while True:
 
         cv2.rectangle(image, (x1, y1), (x2, y2), (0,0,0), 2)
         cv2.putText(image, prediction_character, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0), 2, cv2.LINE_AA)
+        curr.append(prediction_character)
 
+    if curr == test:
+        webbrowser.open("https://github.com/SelimC06")
     cv2.imshow("Image", image)
-    cv2.waitKey(1)
+    cv2.waitKey(25)
 
 cap.release()
 cv2.destroyAllWindows()
