@@ -15,23 +15,27 @@ mpDrawStyles = mp.solutions.drawing_styles
 
 hands = mp_hands.Hands(static_image_mode = True, min_detection_confidence = 0.3)
 
-labels = {0: 'C', 1: 'O'}
+labels = {0: 'Close', 1: 'Open'}
 while True:
     ret, image = cap.read()
     data_setup = []
+    x_ = []
+    y_ = []
+
+    h, w, _ = image.shape
 
     img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     results = hands.process(img_rgb)
     if results.multi_hand_landmarks:
-        for handLms in results.multi_hand_landmarks:
-            mpDraw.draw_landmarks(
-                image,
-                handLms,
-                mp_hands.HAND_CONNECTIONS,
-                mpDrawStyles.get_default_hand_landmarks_style(),
-                mpDrawStyles.get_default_hand_connections_style()
-            )
+        #for handLms in results.multi_hand_landmarks:
+        #    mpDraw.draw_landmarks(
+        #        image,
+        #        handLms,
+        #        mp_hands.HAND_CONNECTIONS,
+        #        mpDrawStyles.get_default_hand_landmarks_style(),
+        #        mpDrawStyles.get_default_hand_connections_style()
+        #    )
         
         for handLms in results.multi_hand_landmarks:
                 for i in range(len(handLms.landmark)):
@@ -39,12 +43,21 @@ while True:
                     y = handLms.landmark[i].y
                     data_setup.append(x)
                     data_setup.append(y)
+                    x_.append(x)
+                    y_.append(y)
+        
+        x1 = int(min(x_) * w) - 10
+        y1 = int(min(y_) * h) - 10
+
+        x2 = int(max(x_) * w) - 10
+        y2 = int(max(y_) * h) - 10
 
         prediction = model.predict([np.asarray(data_setup)])
 
         prediction_character = labels[int(prediction[0])]
 
-        print(prediction_character)
+        cv2.rectangle(image, (x1, y1), (x2, y2), (0,0,0), 2)
+        cv2.putText(image, prediction_character, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0), 2, cv2.LINE_AA)
 
     cv2.imshow("Image", image)
     cv2.waitKey(1)
