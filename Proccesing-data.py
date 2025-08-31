@@ -4,7 +4,7 @@ import cv2
 import os
 import matplotlib.pyplot as plt
 
-DATA = "./data"
+DATA = os.path.join(os.path.dirname(__file__), "data")
 
 mp_hands = mp.solutions.hands
 mpDraw = mp.solutions.drawing_utils
@@ -31,6 +31,7 @@ for dir in os.listdir(DATA):
             data.append(data_setup)
             label_data.append(dir)
 
-f = open('data.pickle', 'wb')
-pickle.dump({'data': data, 'labels': label_data})
-f.close()
+pickle_path = os.path.join(os.path.dirname(__file__), "data.pickle")
+with open(pickle_path, "wb") as f:
+    pickle.dump({"data": data, "labels": label_data}, f)
+print(f"Wrote pickle to: {pickle_path}")
